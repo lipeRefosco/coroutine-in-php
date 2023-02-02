@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "rexshi.phpdoc-comment-vscode-plugin",
+        "bmewburn.vscode-intelephense-client",
+        "mehedidracula.php-namespace-resolver"
+    ]
+}
