@@ -1,5 +1,8 @@
 {
     "name": "lipe/php-coroutine",
+    "scripts": {
+        "dev": "php ./examples/coroutine.php"
+    },
     "autoload": {
         "psr-4": {
             "Lipe\\PhpCoroutine\\": "src/"
