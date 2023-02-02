@@ -1,0 +1,15 @@
+{
+    "name": "lipe/php-coroutine",
+    "autoload": {
+        "psr-4": {
+            "Lipe\\PhpCoroutine\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "lipeRefosco",
+            "email": "luisfelipe.refosco@hotmail.com"
+        }
+    ],
+    "require": {}
+}
