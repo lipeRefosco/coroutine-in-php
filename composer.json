@@ -1,7 +1,10 @@
 {
     "name": "lipe/php-coroutine",
     "scripts": {
-        "dev": "php ./examples/coroutine.php"
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "php ./examples/coroutine.php"
+        ]
     },
     "autoload": {
         "psr-4": {
