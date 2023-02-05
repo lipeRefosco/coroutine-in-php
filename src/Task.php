@@ -4,16 +4,16 @@ namespace Lipe\PhpCoroutine;
 
 use Generator;
 
-final class Routine
+final class Task
 {
 
     private State $state;
     private Generator $generator;
 
-    function __construct(Generator $generator)
+    function __construct(callable $generator)
     {
         $this->state = State::Startup;
-        $this->generator = $generator;
+        $this->generator = $generator();
     }
 
     public function resolve(): void
