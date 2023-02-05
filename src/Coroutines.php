@@ -4,30 +4,30 @@ namespace Lipe\PhpCoroutine;
 
 class Coroutines
 {
-    static private array $routines;
+    static private array $tasks;
 
 
-    static function Add(callable $newRoutine, mixed ...$params): void
+    static function Add(callable $newTask, mixed ...$params): void
     {
-        self::$routines[] = new Task($newRoutine, $params);
+        self::$tasks[] = new Task($newTask, $params);
     }
 
     static function ResolveAll(): void
     {
-        foreach (self::$routines as $position => $routine) {
-            $routine->resolve();
-            self::ClearIfDone($routine->state(), $position);
+        foreach (self::$tasks as $position => $task) {
+            $task->resolve();
+            self::ClearIfDone($task->state(), $position);
         }
     }
 
-    static function Remove($routinePositon): void
+    static function Remove($taskPosition): void
     {
-        unset(self::$routines[$routinePositon]);
+        unset(self::$tasks[$taskPosition]);
     }
 
     static function isAllDone(): bool
     {
-        return empty(self::$routines);
+        return empty(self::$tasks);
     }
 
     static function Run(): void

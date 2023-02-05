@@ -30,7 +30,7 @@ Coroutines::Add(function () {
     echo "(3) ... mais do que..." . PHP_EOL;
     yield;
     
-    echo "(3) ... duas interações!!!" . PHP_EOL;
+    echo "(3) ... duas iterações!!!" . PHP_EOL;
     yield;
 });
 
