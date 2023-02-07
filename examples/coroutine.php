@@ -3,10 +3,13 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use Lipe\PhpCoroutine\Coroutines;
+use Lipe\PhpCoroutine\State;
 
 Coroutines::Add(function () {
     echo "(1) First execution ..." . PHP_EOL;
     yield;
+
+    yield from Coroutines::Sleep(3);
 
     echo "(1) ...of a generator!!" . PHP_EOL;
     yield;
