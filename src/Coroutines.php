@@ -2,17 +2,19 @@
 
 namespace Lipe\PhpCoroutine;
 
+use Generator;
+
 class Coroutines
 {
     static private array $tasks;
 
 
-    static function Add(callable $newTask, mixed ...$params): void
+    public static function Add(callable $newTask, mixed ...$params): void
     {
         self::$tasks[] = new Task($newTask, $params);
     }
 
-    static function ResolveAll(): void
+    public static function ResolveAll(): void
     {
         foreach (self::$tasks as $position => $task) {
             $task->resolve();
@@ -20,23 +22,31 @@ class Coroutines
         }
     }
 
-    static function Remove($taskPosition): void
+    private static function Remove($taskPosition): void
     {
         unset(self::$tasks[$taskPosition]);
     }
 
-    static function isAllDone(): bool
+    private static function isAllDone(): bool
     {
         return empty(self::$tasks);
     }
 
-    static function Run(): void
+    public static function Run(): void
     {
         while(!self::isAllDone()) self::ResolveAll();
     }
 
-    static function ClearIfDone(State $state, int $position): void
+    private static function ClearIfDone(State $state, int $position): void
     {
         if($state == State::Done ) self::Remove($position);
+    }
+
+    public static function Sleep(int $second): Generator
+    {
+        $deadline = time() + $second;
+        while(time() < $deadline) {
+            yield State::Paused;
+        }
     }
 }
