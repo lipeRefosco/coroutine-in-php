@@ -16,15 +16,12 @@ class Coroutines
 
     public static function ResolveAll(): void
     {
-        foreach (self::$tasks as $position => $task) {
-            $task->resolve();
-            self::ClearIfDone($task->state(), $position);
-        }
-    }
+        $task = array_shift(self::$tasks);
+        $task->resolve()->next();
 
-    private static function Remove($taskPosition): void
-    {
-        unset(self::$tasks[$taskPosition]);
+        if($task->isRunning()) self::$tasks[] = $task;
+        if($task->isPaused()) self::$tasks[] = $task;
+        if($task->isDone()) return;
     }
 
     private static function isAllDone(): bool
@@ -35,11 +32,6 @@ class Coroutines
     public static function Run(): void
     {
         while(!self::isAllDone()) self::ResolveAll();
-    }
-
-    private static function ClearIfDone(State $state, int $position): void
-    {
-        if($state == State::Done ) self::Remove($position);
     }
 
     public static function Sleep(int $second): Generator

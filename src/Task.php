@@ -16,18 +16,16 @@ final class Task
         $this->generator = $generator(...$params);
     }
 
-    public function resolve(): State
+    public function resolve(): Generator
     {
         if($this->isStarted()) { 
             $this->state = $this->current();
-            return $this->state();
+            return yield;
         }
-        
-        $this->isValid()
-            ? $this->next()
-            : $this->state = State::Done;
-            
-        return $this->state();
+
+        $this->state = $this->isValid() ? $this->next() : State::Done;
+
+        return yield;
     }
 
     private function current(): State
@@ -37,7 +35,13 @@ final class Task
 
     private function next(): State
     {
-        return $this->generator->next() ?? State::Running;
+        $this->generator->next();
+        return $this->current() ?? State::Running;
+    }
+
+    public function pause(): void
+    {
+        $this->state = State::Paused;
     }
 
     public function state(): State 
