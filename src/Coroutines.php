@@ -45,7 +45,7 @@ class Coroutines
     public static function Sleep(int $second): Generator
     {
         $deadline = time() + $second;
-        while(time() < $deadline) {
+        while(time() <= $deadline) {
             yield State::Paused;
         }
     }
