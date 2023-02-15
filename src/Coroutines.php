@@ -6,32 +6,62 @@ use Generator;
 
 class Coroutines
 {
-    static private array $tasks;
+    private static array $tasks = [
+        "startup" => [],
+        "running" => [],
+        "paused"  => [],
+        "done"    => []
+    ];
 
-
-    public static function Add(callable $newTask, mixed ...$params): void
+    public static function Add(callable $newTask, mixed $params = null): Task
     {
-        self::$tasks[] = new Task($newTask, $params);
+        $task = new Task($newTask, $params);
+
+        array_push(self::$tasks["startup"], $task);
+
+        return $task;
     }
 
-    public static function ResolveAll(): void
+    public static function ResolveAll(string $state): void
     {
-        $task = array_shift(self::$tasks);
+        if(self::isAllDone($state)) return;
+
+        $task = array_shift(self::$tasks[$state]);
+
         $task->resolve()->next();
 
-        if($task->isRunning()) self::$tasks[] = $task;
-        if($task->isPaused()) self::$tasks[] = $task;
-        if($task->isDone()) return;
+        self::Switch($task);
     }
 
-    private static function isAllDone(): bool
+    private static function Switch (Task $task): void
     {
-        return empty(self::$tasks);
+        if($task->isRunning()) array_push(self::$tasks["running"], $task);
+        if($task->isPaused()) array_push(self::$tasks["paused"], $task);
+        if($task->isDone()) array_push(self::$tasks["done"], $task);
+    }
+
+    public static function ClearAll(string $state): void
+    {
+        array_shift(self::$tasks[$state]);
+    }
+
+    private static function isAllDone(string $state): bool
+    {
+        return empty(self::$tasks[$state]);
     }
 
     public static function Run(): void
     {
-        while(!self::isAllDone()) self::ResolveAll();
+        while(
+            !self::isAllDone("startup") ||
+            !self::isAllDone("running") ||
+            !self::isAllDone("paused")
+        ) {
+            self::ResolveAll("startup");
+            self::ResolveAll("running");
+            self::ResolveAll("paused");
+            var_dump(self::$tasks["done"]);
+        }
     }
 
     public static function Sleep(int $second): Generator

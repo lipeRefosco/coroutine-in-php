@@ -6,14 +6,14 @@ use Generator;
 
 final class Task
 {
-
     private State $state;
-    private Generator $generator;
+    public ?int $waiting = null;
+    public Generator $generator;
 
-    function __construct(callable $generator, ...$params)
+    function __construct(callable $userCallable, $params)
     {
         $this->state = State::Startup;
-        $this->generator = $generator(...$params);
+        $this->generator = $userCallable($this, $params);
     }
 
     public function resolve(): Generator
@@ -24,24 +24,18 @@ final class Task
         }
 
         $this->state = $this->isValid() ? $this->next() : State::Done;
-
         return yield;
     }
 
-    private function current(): State
+    public function current(): State
     {
         return $this->generator->current() ?? State::Running;
     }
 
-    private function next(): State
+    public function next(): State
     {
         $this->generator->next();
         return $this->current() ?? State::Running;
-    }
-
-    public function pause(): void
-    {
-        $this->state = State::Paused;
     }
 
     public function state(): State 
