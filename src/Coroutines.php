@@ -60,7 +60,6 @@ class Coroutines
             self::ResolveAll("startup");
             self::ResolveAll("running");
             self::ResolveAll("paused");
-            var_dump(self::$tasks["done"]);
         }
     }
 
