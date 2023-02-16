@@ -6,58 +6,32 @@ use Generator;
 
 class Coroutines
 {
-    private static array $tasks = [
-        "startup" => [],
-        "running" => [],
-        "paused"  => [],
-        "done"    => []
-    ];
+    private static array $tasks = [];
 
     public static function Add(callable $newTask, mixed $params = null): void
     {
         $task = new Task($newTask, $params);
 
-        array_push(self::$tasks["startup"], $task);
+        array_push(self::$tasks, $task);
     }
 
-    public static function ResolveAll(string $state): void
+    public static function ResolveAll(): void
     {
-        if(self::isAllDone($state)) return;
-
-        $task = array_shift(self::$tasks[$state]);
-
-        $task->resolve()->next();
-
-        self::Switch($task);
+        foreach(self::$tasks as $i => $task) {
+            $task->resolve()->next();
+            if($task->isDone()) unset(self::$tasks[$i]);
+        }
     }
 
-    private static function Switch (Task $task): void
+    private static function isAllDone(): bool
     {
-        if($task->isRunning()) array_push(self::$tasks["running"], $task);
-        if($task->isPaused()) array_push(self::$tasks["paused"], $task);
-        if($task->isDone()) array_push(self::$tasks["done"], $task);
-    }
-
-    public static function ClearAll(string $state): void
-    {
-        array_shift(self::$tasks[$state]);
-    }
-
-    private static function isAllDone(string $state): bool
-    {
-        return empty(self::$tasks[$state]);
+        return empty(self::$tasks);
     }
 
     public static function Run(): void
     {
-        while(
-            !self::isAllDone("startup") ||
-            !self::isAllDone("running") ||
-            !self::isAllDone("paused")
-        ) {
-            self::ResolveAll("startup");
-            self::ResolveAll("running");
-            self::ResolveAll("paused");
+        while(!self::isAllDone()) {
+            self::ResolveAll();
         }
     }
 

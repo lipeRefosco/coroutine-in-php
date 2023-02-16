@@ -7,8 +7,7 @@ use Generator;
 final class Task
 {
     private State $state;
-    public ?int $waiting = null;
-    public Generator $generator;
+    private Generator $generator;
 
     function __construct(callable $userCallable, $params)
     {
@@ -20,14 +19,14 @@ final class Task
     {
         if($this->isStarted()) { 
             $this->state = $this->current();
-            return yield;
+            yield;
         }
 
         $this->state = $this->isValid() ? $this->next() : State::Done;
-        return yield;
+        yield;
     }
 
-    public function current(): State
+    private function current(): State
     {
         return $this->generator->current() ?? State::Running;
     }
@@ -38,11 +37,6 @@ final class Task
         return $this->current() ?? State::Running;
     }
 
-    public function state(): State 
-    {
-        return $this->state;
-    }
-
     public function isStarted(): bool
     {
         return $this->state == State::Startup;
@@ -51,11 +45,6 @@ final class Task
     public function isRunning(): bool
     {
         return $this->state == State::Running;
-    }
-
-    public function isPaused(): bool
-    {
-        return $this->state == State::Paused;
     }
 
     public function isDone(): bool
