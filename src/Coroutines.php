@@ -13,13 +13,11 @@ class Coroutines
         "done"    => []
     ];
 
-    public static function Add(callable $newTask, mixed $params = null): Task
+    public static function Add(callable $newTask, mixed $params = null): void
     {
         $task = new Task($newTask, $params);
 
         array_push(self::$tasks["startup"], $task);
-
-        return $task;
     }
 
     public static function ResolveAll(string $state): void
